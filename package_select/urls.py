@@ -1,7 +1,7 @@
 from django.urls import path
-
-from . import views
+from .views import SelectPackage
+app_name = 'package_select'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', SelectPackage.as_view(), name="home")
 ]
