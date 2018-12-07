@@ -18,7 +18,7 @@ RECOGNITION_PACKAGE = (
 )
 
 
-class Sound(models.Model):
-    input_method = models.CharField(choices=INPUT_METHOD, default='upload', max_length=255)
+class Document(models.Model):
+    description = models.CharField(max_length=255, blank=True)
     document = models.FileField(upload_to='documents/')
-    recognition_package = models.CharField(choices=RECOGNITION_PACKAGE, default='upload', max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)

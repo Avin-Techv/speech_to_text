@@ -1,9 +1,8 @@
 from django import forms
-from .models import Sound
+from .models import Document
 
 
-class SelectPackageForm(forms.ModelForm):
-
+class DocumentForm(forms.ModelForm):
     class Meta:
-            model = Sound
-            fields = ['input_method', 'document', 'recognition_package']
+        model = Document
+        fields = ('description', 'document', )
