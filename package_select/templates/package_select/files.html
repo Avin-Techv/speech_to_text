@@ -1,0 +1,21 @@
+{% include 'package_select/base.html' %}
+<body>
+    <div class="container">
+      <h1>Files Form</h1>
+
+      {% block content %}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>Uploaded files:</p>
+          <ul>
+            {% for obj in documents %}
+              <li>
+                <a href="{{ obj.document.url }}">{{ obj.document.name }}</a>
+                <small>(Uploaded at: {{ obj.uploaded_at }})</small>
+              </li>
+            {% endfor %}
+          </ul>
+      </form>
+    {% endblock %}
+    </div>
+</body>
