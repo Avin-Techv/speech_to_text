@@ -6,4 +6,18 @@ class SelectPackageForm(forms.ModelForm):
 
     class Meta:
             model = Sound
-            fields = ['input_method', 'document', 'recognition_package']
+            fields = []
+
+
+class UploadFileForm(forms.ModelForm):
+
+    class Meta:
+            model = Sound
+            fields = ['document']
+
+
+class RecordFileForm(forms.ModelForm):
+
+    class Meta:
+            model = Sound
+            fields = []

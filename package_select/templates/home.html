@@ -2,13 +2,10 @@
 <body>
     <div class="container">
       <h1>Speech to Text</h1>
-      <p>Select the package to perform speech to text translation</p>
 
       {% block content %}
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Upload</button>
       </form>
     {% endblock %}
 
