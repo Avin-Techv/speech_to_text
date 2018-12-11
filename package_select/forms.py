@@ -2,7 +2,22 @@ from django import forms
 from .models import Document
 
 
-class DocumentForm(forms.ModelForm):
+class SelectPackageForm(forms.ModelForm):
+
     class Meta:
-        model = Document
-        fields = ('description', 'document', )
+            model = Document
+            fields = []
+
+
+class UploadFileForm(forms.ModelForm):
+
+    class Meta:
+            model = Document
+            fields = ['document']
+
+
+class RecordFileForm(forms.ModelForm):
+
+    class Meta:
+            model = Document
+            fields = []

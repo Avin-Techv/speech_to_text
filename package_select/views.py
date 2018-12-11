@@ -1,21 +1,22 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponse
-from django.views.generic import View
-from .forms import DocumentForm
+from django.views.generic import FormView
+from .forms import SelectPackageForm, UploadFileForm, RecordFileForm
 
 
-class UserHome(View):
-    template_name = 'home.html'
+class SelectPackage(FormView):
+    template_name = "package_select/home.html"
+    form_class = SelectPackageForm
+    success_url = '.'
 
 
-def model_form_upload(request):
-    if request.method == 'POST':
-        form = DocumentForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = DocumentForm()
-    return render(request, 'package_select/home.html', {
-        'form': form
-    })
+class UploadFile(FormView):
+    template_name = "package_select/upload_file.html"
+    form_class = UploadFileForm
+    success_url = '.'
+
+
+class RecordFile(FormView):
+    template_name = "package_select/record_file.html"
+    form_class = RecordFileForm
+    success_url = '.'

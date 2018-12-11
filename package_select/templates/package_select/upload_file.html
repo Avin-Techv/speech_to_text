@@ -1,11 +1,13 @@
 {% include 'package_select/base.html' %}
 <body>
     <div class="container">
-      <h1>Speech to Text</h1>
+      <h1>Upload Form</h1>
 
       {% block content %}
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
       </form>
     {% endblock %}
 
