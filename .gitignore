@@ -1,0 +1,17 @@
+#Exclude IDE based files
+.idea/
+
+#Exclude Compiled files
+*.pyc
+*/*/*/__pycache__/
+*/*/__pycache__/
+*/__pycache__/
+
+#Exclude Media files
+media/
+
+#Exclude database files
+db.sqlite3
+
+#Exclude environment files
+env/
