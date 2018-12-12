@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.views.generic import FormView, TemplateView
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View, FormView, TemplateView
 from .forms import SelectPackageForm, UploadFileForm, RecordFileForm
 from .models import Document
 
-from django.views.generic import View
-from django.urls import reverse_lazy
+from django.http import HttpResponse
+import speech_recognition as sr
+from pydub import AudioSegment
+
+from os import path
 
 
 class SelectPackage(FormView):
@@ -46,4 +49,6 @@ class FilesList(TemplateView):
         return render(request, 'package_select/files.html', {'documents': documents})
 
 
-
+class AnalyseFile(View):
+    def post(self, request, *args, **kwargs):
+        import pdb;pdb.set_trace()

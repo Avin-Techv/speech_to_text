@@ -1,4 +1,5 @@
 {% include 'package_select/base.html' %}
+
 <body>
     <div class="container">
       <h1>Files Form</h1>
@@ -12,6 +13,27 @@
               <li>
                 <a href="{{ obj.document.url }}">{{ obj.document.name }}</a>
                 <small>(Uploaded at: {{ obj.uploaded_at }})</small>
+                <!-- Trigger the modal with a button -->
+                <button data-id="{{obj.id}}" id="analyse_button" type="button" class="btn btn-info" data-toggle="modal">Analyse</button>
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" role="dialog">
+                  <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Modal Header</h4>
+                      </div>
+                      <div class="modal-body">
+                        <p></p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </li>
             {% endfor %}
           </ul>
@@ -19,3 +41,68 @@
     {% endblock %}
     </div>
 </body>
+<script>
+jQuery(document).ajaxSend(function(event, xhr, settings) {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    function sameOrigin(url) {
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+    function safeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+    }
+});
+
+$( document ).ready(function() {
+
+
+
+    $(document).on("click","#analyse_button",function() {
+      var file_id = $(this).data("id");
+      $.ajax({
+        url: '/analyse/',
+        method: 'POST',
+        data: {
+          'file_id': file_id
+        },
+        dataType: 'json',
+        success: function (data) {
+
+        },
+          error: function (data) {
+            alert()
+        }
+      });
+
+    });
+});
+
+
+
+</script>
