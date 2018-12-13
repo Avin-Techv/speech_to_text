@@ -54,16 +54,18 @@ class FilesList(TemplateView):
 
 class AnalyseFile(View):
     def post(self, request, *args, **kwargs):
-        file_id = request.POST.get('file_id')
-        file_object = Document.objects.get(id=file_id)
-        sound = AudioSegment.from_mp3(file_object.document)
-        AUDIO_FILE = os.path.join(settings.MEDIA_ROOT, "transcript.wav")
-        sound.export(AUDIO_FILE, format="wav")
+        try:
+            file_id = request.POST.get('file_id')
+            file_object = Document.objects.get(id=file_id)
+            audio_file = os.path.join(settings.MEDIA_ROOT, str(file_object.document))
+            sound = AudioSegment.from_mp3(audio_file)
+            sound.export(audio_file, format="wav")
 
+            recogniser = sr.Recognizer()
+            with sr.AudioFile(audio_file) as source:
+                audio = recogniser.record(source)  # read the entire audio file
 
-        # use the audio file as the audio source
-        r = sr.Recognizer()
-        with sr.AudioFile(AUDIO_FILE) as source:
-            audio = r.record(source)  # read the entire audio file
-
-            print("Transcription: " + r.recognize_google(audio))
+                print("Transcription: " + recogniser.recognize_google(audio))
+            return HttpResponse()
+        except IOError:
+            pass
