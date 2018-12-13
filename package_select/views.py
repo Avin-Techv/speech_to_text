@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View, FormView, TemplateView
@@ -51,4 +54,16 @@ class FilesList(TemplateView):
 
 class AnalyseFile(View):
     def post(self, request, *args, **kwargs):
-        import pdb;pdb.set_trace()
+        file_id = request.POST.get('file_id')
+        file_object = Document.objects.get(id=file_id)
+        sound = AudioSegment.from_mp3(file_object.document)
+        AUDIO_FILE = os.path.join(settings.MEDIA_ROOT, "transcript.wav")
+        sound.export(AUDIO_FILE, format="wav")
+
+
+        # use the audio file as the audio source
+        r = sr.Recognizer()
+        with sr.AudioFile(AUDIO_FILE) as source:
+            audio = r.record(source)  # read the entire audio file
+
+            print("Transcription: " + r.recognize_google(audio))
