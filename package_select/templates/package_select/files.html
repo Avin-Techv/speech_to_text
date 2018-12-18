@@ -10,7 +10,7 @@
 
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <p style="margin-top: 100px;">Uploaded files:</p>
+        <p style="margin-top: 50px;">Uploaded files:</p>
           <ul>
             {% for obj in documents %}
               <li>
@@ -133,6 +133,7 @@ $( document ).ready(function() {
 
 .left {
   left: 0;
+  top: 60px;
 }
 
 .right {
