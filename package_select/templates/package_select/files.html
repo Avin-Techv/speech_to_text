@@ -2,19 +2,22 @@
 
 <body>
     <div class="container">
+
       <h1>Files Form</h1>
 
+      <div class="split left">
       {% block content %}
+
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <p>Uploaded files:</p>
+        <p style="margin-top: 100px;">Uploaded files:</p>
           <ul>
             {% for obj in documents %}
               <li>
-                <a href="{{ obj.document.url }}">{{ obj.document.name }}</a>
+                <a href="{{ obj.document.url }}">{{ obj.document.name }}</a><br>
                 <small>(Uploaded at: {{ obj.uploaded_at }})</small>
                 <!-- Trigger the modal with a button -->
-                <button data-id="{{obj.id}}" id="analyse_button" type="button" class="btn btn-info" data-toggle="modal">Analyse</button>
+                <button data-id="{{obj.id}}" id="analyse_button" type="button" class="btn btn-info" data-toggle="modal" style="margin-top: -18px; float: right;">Analyse</button>
                 <!-- Modal -->
                 <div class="modal fade" id="myModal" role="dialog">
                   <div class="modal-dialog">
@@ -39,6 +42,22 @@
           </ul>
       </form>
     {% endblock %}
+    </div>
+
+      <div class="split right">
+        <p style="margin-top: 100px;">Content</p>
+        <div class="content" style="width: auto;
+    height: auto;
+    padding: 200px;
+    border: 1px solid black;
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;">
+
+        </div>
+        {{ content }}
+      </div>
+
     </div>
 </body>
 <script>
@@ -82,7 +101,6 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
 $( document ).ready(function() {
     $(document).on("click","#analyse_button",function() {
       var file_id = $(this).data("id");
-      alert(file_id)
       $.ajax({
         url: '/analyse/',
         method: 'POST',
@@ -91,16 +109,34 @@ $( document ).ready(function() {
         },
         dataType: 'json',
         success: function (data) {
-
+            alert("Conversion Success")
         },
           error: function (data) {
-            alert()
+            alert("Conversion Failed");
         }
       });
 
     });
 });
-
-
-
 </script>
+
+<style>
+.split {
+  height: 100%;
+  width: 50%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
+}
+
+</style>

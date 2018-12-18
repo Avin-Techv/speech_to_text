@@ -65,7 +65,7 @@ class AnalyseFile(View):
             with sr.AudioFile(audio_file) as source:
                 audio = recogniser.record(source)  # read the entire audio file
 
-                print("Transcription: " + recogniser.recognize_google(audio))
-            return HttpResponse()
+                content = recogniser.recognize_google(audio)
+            return render(request, 'package_select/files.html', {'content': content})
         except IOError:
             pass
