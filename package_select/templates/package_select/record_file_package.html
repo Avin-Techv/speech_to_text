@@ -1,0 +1,33 @@
+{% include 'package_select/base.html' %}
+{% load static %}
+<!-- Custom style for this page-->
+<link href="{%static 'css/recorder.css' %}" rel="stylesheet">
+
+<body>
+<style>
+
+			canvas {
+				display: inline-block;
+				background: #202020;
+				width: 95%;
+				height: 45%;
+				box-shadow: 0px 0px 10px blue;
+			}
+
+		</style>
+		<div class="container">
+        <div id="viz">
+			<canvas id="analyser" width="1024" height="333" style="height: 30%; position: relative;"></canvas>
+			<canvas id="wavedisplay" width="1024" height="333" style="height: 30%; position: relative;"></canvas>
+			<canvas id="transcribe" width="1024" height="333" style="height: 30%; position: relative;"></canvas>
+		<div id="controls">
+			<div></div>
+            <img id="record" src="{%static 'icon/mic128.png' %}" onclick="toggleRecording(this);" style="position: absolute; top: 141px; right: 0px;">
+			<div>
+            <a id="save" >
+				<img src="{%static 'icon/rsz_save.jpg' %}" style="position: absolute; top: 495px; right: 0px;">
+			</a>
+			<img id="transcribe_logo" src="{%static 'icon/transcribe.png' %}" style="position: absolute; top: 865px; right: 0px;">
+		</div>
+		</div>
+</body>
