@@ -1,33 +1,78 @@
 {% include 'package_select/base.html' %}
 {% load static %}
 <!-- Custom style for this page-->
-<link href="{%static 'css/recorder.css' %}" rel="stylesheet">
+<link href="{%static 'css/recorder_google.css' %}" rel="stylesheet">
 
 <body>
-<style>
+    <div class="container">
+      <h1>Record Via Package</h1>
 
-			canvas {
-				display: inline-block;
-				background: #202020;
-				width: 95%;
-				height: 45%;
-				box-shadow: 0px 0px 10px blue;
-			}
+        {% block content %}
+        {% csrf_token %}
+        {{ form.as_p }}
+          <h1 class="center" id="headline"></h1>
+    <div class="right">
+      <button id="start_button">
+        <img id="start_img" src="../static/icon/mic.gif" alt="Start"/></button>
+    </div>
+    <div id="results">
+      <span id="final_span" class="final"></span>
+      <span id="interim_span" class="interim"></span>
+      <p>
+    </div>
+    <div class="center">
+      <div class="sidebyside" style="text-align:right">
+        <button id="copy_button" class="button" onclick="copyButton()">
+          Copy and Paste</button>
+        <div id="copy_info" class="info">
+          Press Control-C to copy text.<br>(Command-C on Mac.)
+        </div>
+      </div>
+      <div class="sidebyside">
+        <button id="email_button" class="button" onclick="emailButton()">
+          Create Email</button>
+        <div id="email_info" class="info">
+          Text sent to default email application.<br>
+          (See chrome://settings/handlers to change.)
+        </div>
+      </div>
 
-		</style>
-		<div class="container">
-        <div id="viz">
-			<canvas id="analyser" width="1024" height="333" style="height: 30%; position: relative;"></canvas>
-			<canvas id="wavedisplay" width="1024" height="333" style="height: 30%; position: relative;"></canvas>
-			<canvas id="transcribe" width="1024" height="333" style="height: 30%; position: relative;"></canvas>
-		<div id="controls">
-			<div></div>
-            <img id="record" src="{%static 'icon/mic128.png' %}" onclick="toggleRecording(this);" style="position: absolute; top: 141px; right: 0px;">
-			<div>
-            <a id="save" >
-				<img src="{%static 'icon/rsz_save.jpg' %}" style="position: absolute; top: 495px; right: 0px;">
-			</a>
-			<img id="transcribe_logo" src="{%static 'icon/transcribe.png' %}" style="position: absolute; top: 865px; right: 0px;">
-		</div>
-		</div>
+    {% endblock %}
+
+    </div>
+	</div>
 </body>
+<div id="info">
+      <p id="info_speak_now">Speak now.</p>
+      <p id="info_denied">Permission to use - was denied.</p>
+</div>
+<script>
+
+//on page load toggle image
+
+
+//get microphone access
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+        $("#start_img").attr("src", "../static/icon/mic-animate.gif");
+        showInfo('info_speak_now');
+    })
+    .catch(function(err) {
+        $("#start_img").attr("src", "../static/icon/mic-slash.gif");
+        showInfo('info_denied');
+    });
+
+function showInfo(s) {
+  if (s) {
+    for (var child = info.firstChild; child; child = child.nextSibling) {
+      if (child.style) {
+        child.style.display = child.id == s ? 'inline' : 'none';
+      }
+    }
+    info.style.visibility = 'visible';
+  } else {
+    info.style.visibility = 'hidden';
+  }
+}
+
+</script>

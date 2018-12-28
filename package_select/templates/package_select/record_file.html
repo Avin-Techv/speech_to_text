@@ -1,7 +1,7 @@
 {% include 'package_select/base.html' %}
 {% load static %}
 <!-- Custom style for this page-->
-<link href="{%static 'css/recorder.css' %}" rel="stylesheet">
+<link href="{%static 'css/recorder_google.css' %}" rel="stylesheet">
 
 <body>
     <div class="container">
@@ -58,7 +58,7 @@
         <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
         microphone settings</a> are configured correctly.</p>
       <p id="info_allow">Click the "Allow" button above to enable your microphone.</p>
-      <p id="info_denied">Permission to use microphone was denied.</p>
+  <p id="info_denied">Permission to use - was denied.</p>
       <p id="info_blocked">Permission to use microphone is blocked. To change,
         go to chrome://settings/contentExceptions#media-stream</p>
       <p id="info_upgrade">Web Speech API is not supported by this browser.
@@ -320,15 +320,5 @@ function showInfo(s) {
   }
 }
 
-var current_style;
-function showButtons(style) {
-  if (style == current_style) {
-    return;
-  }
-  current_style = style;
-  copy_button.style.display = style;
-  email_button.style.display = style;
-  copy_info.style.display = 'none';
-  email_info.style.display = 'none';
-}
+
 </script>

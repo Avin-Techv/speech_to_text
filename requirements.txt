@@ -3,3 +3,4 @@ PyAudio==0.2.11
 pydub==0.23.0
 pytz==2018.7
 SpeechRecognition==3.8.1
+mycroft-precise==0.2.0
