@@ -4,3 +4,8 @@ pydub==0.23.0
 pytz==2018.7
 SpeechRecognition==3.8.1
 mycroft-precise==0.2.0
+pyspeech==0.0.0
+gTTS==2.0.3
+Pygame==1.9.4
+Sphinx==1.8.3
+schedule==0.5.0

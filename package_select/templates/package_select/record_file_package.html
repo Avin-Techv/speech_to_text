@@ -16,9 +16,8 @@
         <img id="start_img" src="../static/icon/mic.gif" alt="Start"/></button>
     </div>
     <div id="results">
-      <span id="final_span" class="final"></span>
+      <span id="final_span" class="final">{{ response }}</span>
       <span id="interim_span" class="interim"></span>
-      <p>
     </div>
     <div class="center">
       <div class="sidebyside" style="text-align:right">
@@ -74,5 +73,12 @@ function showInfo(s) {
     info.style.visibility = 'hidden';
   }
 }
+
+//detect if microphone permissions have been granted in <chrome></chrome>
+navigator.webkitGetUserMedia({audio: active},
+function(){
+    alert('worked')
+});
+
 
 </script>
