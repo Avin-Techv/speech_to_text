@@ -83,15 +83,21 @@ class AnalyseFile(View):
 class RecordPackageFile(TemplateView):
     template_name = "package_select/record_file_package.html"
 
-    def get(self, request, *args, **kwargs):
+    def get_context_data(self, **kwargs):
+        if 'view' not in kwargs:
+            kwargs['view'] = self
+        return kwargs
 
+
+class TranscribeAudio(View):
+    def get(self, request, *args, **kwargs):
         # obtain audio from the microphone
         r = sr.Recognizer()
         with sr.Microphone() as source:
             # print("Please wait. Calibrating microphone...")
             # listen for 1 second and create the ambient noise energy level
             r.adjust_for_ambient_noise(source, duration=1)
-            print("Say something!")
+            print("Speak now.")
             audio = r.listen(source, phrase_time_limit=15)
             print(audio)
 

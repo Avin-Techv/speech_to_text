@@ -13,7 +13,7 @@
           <h1 class="center" id="headline"></h1>
     <div class="right">
       <button id="start_button">
-        <img id="start_img" src="../static/icon/mic.gif" alt="Start"/></button>
+        <img id="start_img" src="../static/icon/mic.gif" alt="Start" onclick="change()"/></button>
     </div>
     <div id="results">
       <span id="final_span" class="final">{{ response }}</span>
@@ -42,25 +42,42 @@
 	</div>
 </body>
 <div id="info">
+      <p id="info_start">Click on the microphone icon and begin speaking.</p>
       <p id="info_speak_now">Speak now.</p>
       <p id="info_denied">Permission to use - was denied.</p>
 </div>
 <script>
 
-//on page load toggle image
-
-
 //get microphone access
 navigator.mediaDevices.getUserMedia({ audio: true })
     .then(function(stream) {
-        $("#start_img").attr("src", "../static/icon/mic-animate.gif");
-        showInfo('info_speak_now');
+        $("#start_img").attr("src", "../static/icon/mic.gif");
+        showInfo('info_start');
     })
     .catch(function(err) {
         $("#start_img").attr("src", "../static/icon/mic-slash.gif");
         showInfo('info_denied');
     });
 
+//toggle mic icon on click
+function change()
+{
+    var image = document.getElementById('start_img');
+
+    var img1 = "../static/icon/mic.gif";
+    var img2 = "../static/icon/mic-animate.gif";
+
+    if (image.getAttribute('src')==img1) {
+       image.setAttribute('src', img2);
+       showInfo('info_speak_now');
+    } else if ((image.getAttribute('src')==img2)) {
+       image.setAttribute('src', img1);
+       showInfo('info_start');
+    }
+}
+
+
+//info hide and show
 function showInfo(s) {
   if (s) {
     for (var child = info.firstChild; child; child = child.nextSibling) {
@@ -73,12 +90,6 @@ function showInfo(s) {
     info.style.visibility = 'hidden';
   }
 }
-
-//detect if microphone permissions have been granted in <chrome></chrome>
-navigator.webkitGetUserMedia({audio: active},
-function(){
-    alert('worked')
-});
 
 
 </script>
