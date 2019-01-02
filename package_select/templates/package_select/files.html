@@ -101,6 +101,8 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
 $( document ).ready(function() {
     $(document).on("click","#analyse_button",function() {
       var file_id = $(this).data("id");
+
+
       $.ajax({
         url: '/analyse/',
         method: 'POST',

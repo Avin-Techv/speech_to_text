@@ -12,11 +12,11 @@
         {{ form.as_p }}
           <h1 class="center" id="headline"></h1>
     <div class="right">
-      <button id="start_button">
-        <img id="start_img" src="../static/icon/mic.gif" alt="Start" onclick="change()"/></button>
+      <button id="start_button" >
+        <img id="start_img" src="../static/icon/mic.gif" alt="Start" onclick="setTimeout(change(), 3000)" onchange="record()"/></button>
     </div>
     <div id="results">
-      <span id="final_span" class="final">{{ response }}</span>
+      <span id="final_span" class="final">{{ transcribed_text }}</span>
       <span id="interim_span" class="interim"></span>
     </div>
     <div class="center">
@@ -70,14 +70,49 @@ function change()
     if (image.getAttribute('src')==img1) {
        image.setAttribute('src', img2);
        showInfo('info_speak_now');
+
+      var isRecording = true;
+
+      $.ajax({
+        url: '/transcribe_audio/',
+        method: 'GET',
+        data: {
+            'isRecording': isRecording
+        },
+        dataType: 'json',
+        success: function (data) {
+            var isRecording = false;
+            $("#final_span").append(data["transcribed_text"]);
+        },
+          error: function (data) {
+        }
+      });
+
     } else if ((image.getAttribute('src')==img2)) {
        image.setAttribute('src', img1);
        showInfo('info_start');
+
+       var isRecording = false;
+
+       $.ajax({
+        url: '/transcribe_audio/',
+        method: 'GET',
+        data: {
+            'isRecording': isRecording
+        },
+        dataType: 'json',
+        success: function (data) {
+            alert("isRecording false Success")
+        },
+          error: function (data) {
+
+        }
+      });
     }
 }
 
 
-//info hide and show
+//div info hide and show
 function showInfo(s) {
   if (s) {
     for (var child = info.firstChild; child; child = child.nextSibling) {
@@ -91,5 +126,6 @@ function showInfo(s) {
   }
 }
 
-
 </script>
+
+

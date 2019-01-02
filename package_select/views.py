@@ -10,7 +10,7 @@ from django.views.generic import View, FormView, TemplateView
 from .forms import SelectPackageForm, UploadFileForm, RecordFileForm
 from .models import Document
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from pydub import AudioSegment
 
 from os import path
@@ -91,24 +91,28 @@ class RecordPackageFile(TemplateView):
 
 class TranscribeAudio(View):
     def get(self, request, *args, **kwargs):
-        # obtain audio from the microphone
-        r = sr.Recognizer()
-        with sr.Microphone() as source:
-            # print("Please wait. Calibrating microphone...")
-            # listen for 1 second and create the ambient noise energy level
-            r.adjust_for_ambient_noise(source, duration=1)
-            print("Speak now.")
-            audio = r.listen(source, phrase_time_limit=15)
-            print(audio)
-
+        print("called")
         try:
-            response = r.recognize_google(audio)
-            print("I think you said '" + response + "'")
-            tts = gTTS(text="I think you said " + str(response), lang='en')
-            tts.save("response.mp3")
-            mixer.music.load('response.mp3')
-            mixer.music.play()
-            return render(request, 'package_select/record_file_package.html', {'response': response})
+            # obtain audio from the microphone
+            isRecording = request.GET.get('isRecording', '')
+            while isRecording:
+                r = sr.Recognizer()
+                with sr.Microphone() as source:
+                    # print("Please wait. Calibrating microphone...")
+                    # listen for 1 second and create the ambient noise energy level
+                    r.adjust_for_ambient_noise(source, duration=1)
+                    print("Recording Started... Say Something...")
+                    audio = r.listen(source, phrase_time_limit=5)
+                    transcribed_text = r.recognize_google(audio)
+                    print("I think you said '" + transcribed_text + "'")
+                    tts = gTTS(text="I think you said " + str(transcribed_text), lang='en')
+                    tts.save("response.mp3")
+                    mixer.music.load('response.mp3')
+                    mixer.music.play()
+                    return JsonResponse({'transcribed_text': transcribed_text}, status=200)
+
+            print("Not Recording...")
+
         except sr.UnknownValueError:
             error = "Google Speech Recognition could not understand audio"
             return render(request, 'package_select/record_file_package.html', {'error': error})
