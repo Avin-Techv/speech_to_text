@@ -91,7 +91,6 @@ class RecordPackageFile(TemplateView):
 
 class TranscribeAudio(View):
     def get(self, request, *args, **kwargs):
-        print("called")
         try:
             # obtain audio from the microphone
             isRecording = request.GET.get('isRecording', '')
@@ -102,10 +101,11 @@ class TranscribeAudio(View):
                     # listen for 1 second and create the ambient noise energy level
                     r.adjust_for_ambient_noise(source, duration=1)
                     print("Recording Started... Say Something...")
-                    audio = r.listen(source, phrase_time_limit=5)
-                    transcribed_text = r.recognize_google(audio)
+                    # audio = r.listen(source, phrase_time_limit=5)
+                    # transcribed_text = r.recognize_google(audio)
+                    transcribed_text = r.recognize_google(r.listen(source))
                     print("I think you said '" + transcribed_text + "'")
-                    tts = gTTS(text="I think you said " + str(transcribed_text), lang='en')
+                    tts = gTTS(text="I think you said " + transcribed_text, lang='en')
                     tts.save("response.mp3")
                     mixer.music.load('response.mp3')
                     mixer.music.play()

@@ -13,7 +13,7 @@
           <h1 class="center" id="headline"></h1>
     <div class="right">
       <button id="start_button" >
-        <img id="start_img" src="../static/icon/mic.gif" alt="Start" onclick="setTimeout(change(), 3000)" onchange="record()"/></button>
+        <img id="start_img" src="../static/icon/mic.gif" alt="Start" onclick="setInterval(change, 3000);" /></button>
     </div>
     <div id="results">
       <span id="final_span" class="final">{{ transcribed_text }}</span>
@@ -52,11 +52,11 @@
 navigator.mediaDevices.getUserMedia({ audio: true })
     .then(function(stream) {
         $("#start_img").attr("src", "../static/icon/mic.gif");
-        showInfo('info_start');
+        //showInfo('info_start');
     })
     .catch(function(err) {
         $("#start_img").attr("src", "../static/icon/mic-slash.gif");
-        showInfo('info_denied');
+        //showInfo('info_denied');
     });
 
 //toggle mic icon on click
@@ -69,20 +69,18 @@ function change()
 
     if (image.getAttribute('src')==img1) {
        image.setAttribute('src', img2);
-       showInfo('info_speak_now');
-
-      var isRecording = true;
+       //showInfo('info_speak_now');
 
       $.ajax({
         url: '/transcribe_audio/',
         method: 'GET',
         data: {
-            'isRecording': isRecording
+            'isRecording': true
         },
         dataType: 'json',
         success: function (data) {
-            var isRecording = false;
             $("#final_span").append(data["transcribed_text"]);
+            $("#final_span").append(" ");
         },
           error: function (data) {
         }
@@ -90,24 +88,7 @@ function change()
 
     } else if ((image.getAttribute('src')==img2)) {
        image.setAttribute('src', img1);
-       showInfo('info_start');
-
-       var isRecording = false;
-
-       $.ajax({
-        url: '/transcribe_audio/',
-        method: 'GET',
-        data: {
-            'isRecording': isRecording
-        },
-        dataType: 'json',
-        success: function (data) {
-            alert("isRecording false Success")
-        },
-          error: function (data) {
-
-        }
-      });
+           //showInfo('info_start');
     }
 }
 
@@ -124,6 +105,11 @@ function showInfo(s) {
   } else {
     info.style.visibility = 'hidden';
   }
+}
+
+//stop recording
+function stopRecording() {
+    clearInterval
 }
 
 </script>
