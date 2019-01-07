@@ -5,15 +5,15 @@
 
 <body>
     <div class="container">
-      <h1>Record Via Package</h1>
+      <h1>Record & Transcribe</h1>
 
         {% block content %}
         {% csrf_token %}
         {{ form.as_p }}
           <h1 class="center" id="headline"></h1>
     <div class="right">
-      <button id="start_button" >
-        <img id="start_img" src="../static/icon/mic.gif" alt="Start" onclick="setInterval(change, 3000);" /></button>
+      <button id="start_button">
+        <img id="start_img" src="../static/icon/mic.gif" alt="Start" /></button>
     </div>
     <div id="results">
       <span id="final_span" class="final">{{ transcribed_text }}</span>
@@ -44,7 +44,7 @@
 <div id="info">
       <p id="info_start">Click on the microphone icon and begin speaking.</p>
       <p id="info_speak_now">Speak now.</p>
-      <p id="info_denied">Permission to use - was denied.</p>
+      <p id="info_denied">Permission to use - was denied. Please check mic permissions and if its connected properly</p>
 </div>
 <script>
 
@@ -52,15 +52,15 @@
 navigator.mediaDevices.getUserMedia({ audio: true })
     .then(function(stream) {
         $("#start_img").attr("src", "../static/icon/mic.gif");
-        //showInfo('info_start');
+        showInfo('info_start');
     })
     .catch(function(err) {
         $("#start_img").attr("src", "../static/icon/mic-slash.gif");
-        //showInfo('info_denied');
+        showInfo('info_denied');
     });
 
 //toggle mic icon on click
-function change()
+start_button.onclick = function toggle()
 {
     var image = document.getElementById('start_img');
 
@@ -69,7 +69,7 @@ function change()
 
     if (image.getAttribute('src')==img1) {
        image.setAttribute('src', img2);
-       //showInfo('info_speak_now');
+       showInfo('info_speak_now');
 
       $.ajax({
         url: '/transcribe_audio/',
@@ -81,14 +81,19 @@ function change()
         success: function (data) {
             $("#final_span").append(data["transcribed_text"]);
             $("#final_span").append(" ");
+            image.setAttribute('src', img1);
+            showInfo('info_start');
         },
           error: function (data) {
+            image.setAttribute('src', img1);
+            showInfo('info_start');
         }
       });
 
     } else if ((image.getAttribute('src')==img2)) {
        image.setAttribute('src', img1);
-           //showInfo('info_start');
+           showInfo('info_start');
+           isRecording == false;
     }
 }
 
@@ -107,10 +112,7 @@ function showInfo(s) {
   }
 }
 
-//stop recording
-function stopRecording() {
-    clearInterval
-}
+
 
 </script>
 

@@ -2,7 +2,6 @@ import os
 import time
 import schedule
 
-
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -18,8 +17,10 @@ from os import path
 import speech_recognition as sr
 from gtts import gTTS
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from pygame import mixer
+
 mixer.init()
 
 
@@ -104,15 +105,18 @@ class TranscribeAudio(View):
                     # audio = r.listen(source, phrase_time_limit=5)
                     # transcribed_text = r.recognize_google(audio)
                     transcribed_text = r.recognize_google(r.listen(source))
-                    print("I think you said '" + transcribed_text + "'")
-                    tts = gTTS(text="I think you said " + transcribed_text, lang='en')
-                    tts.save("response.mp3")
-                    mixer.music.load('response.mp3')
-                    mixer.music.play()
-                    return JsonResponse({'transcribed_text': transcribed_text}, status=200)
-
-            print("Not Recording...")
+                    if transcribed_text != None:
+                        print("I think you said '" + transcribed_text + "'")
+                        tts = gTTS(text="I think you said " + transcribed_text, lang='en')
+                        tts.save("response.mp3")
+                        mixer.music.load('response.mp3')
+                        mixer.music.play()
+                        return JsonResponse({'transcribed_text': transcribed_text}, status=200)
+                    else:
+                        pass
 
         except sr.UnknownValueError:
             error = "Google Speech Recognition could not understand audio"
             return render(request, 'package_select/record_file_package.html', {'error': error})
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
