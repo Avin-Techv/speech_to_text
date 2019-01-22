@@ -2,6 +2,7 @@
 {% load static %}
 <!-- Custom style for this page-->
 <link href="{%static 'css/recorder_google.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
 <body>
     <div class="container">
@@ -10,42 +11,47 @@
         {% block content %}
         {% csrf_token %}
         {{ form.as_p }}
-          <h1 class="center" id="headline"></h1>
+
     <div class="right">
       <button id="start_button">
         <img id="start_img" src="../static/icon/mic.gif" alt="Start" /></button>
     </div>
     <div id="results">
-      <span id="final_span" class="final">{{ transcribed_text }}</span>
+      <span id="final_span" class="final" value="{{ transcribed_text }}">{{ transcribed_text }}</span>
       <span id="interim_span" class="interim"></span>
     </div>
-    <div class="center">
-      <div class="sidebyside" style="text-align:right">
-        <button id="copy_button" class="button" onclick="copyButton()">
-          Copy and Paste</button>
-        <div id="copy_info" class="info">
-          Press Control-C to copy text.<br>(Command-C on Mac.)
-        </div>
-      </div>
-      <div class="sidebyside">
-        <button id="email_button" class="button" onclick="emailButton()">
-          Create Email</button>
-        <div id="email_info" class="info">
-          Text sent to default email application.<br>
-          (See chrome://settings/handlers to change.)
-        </div>
-      </div>
 
     {% endblock %}
 
+    <div id ="button-feedback">
+        <br>
+        <div class="row">
+            <div class="col-sm-12">
+                <center>
+                    <button type="button" class="w3-button w3-blue w3-round" id="copy-button" >Copy to Clipboard</button>
+                    <button type="button" class="w3-button w3-blue w3-round" onclick="ClearFields();">Clear</button>
+                </center>
+            </div>
+            <div class="col-sm-12">
+                <center>
+                    <div id="clipboard-fade">Copied to Clipboard</div>
+                    <div id="cleared-fade">Cleared</div>
+                </center>
+            </div>
+        </div>
     </div>
+
 	</div>
 </body>
-<div id="info">
+    <br>
+    <div id="info">
       <p id="info_start">Click on the microphone icon and begin speaking.</p>
       <p id="info_speak_now">Speak now.</p>
       <p id="info_denied">Permission to use - was denied. Please check mic permissions and if its connected properly</p>
-</div>
+      <p id="got_audio">{{ got_audio }}</p>
+    </div>
+
+
 <script>
 
 //get microphone access
@@ -112,8 +118,59 @@ function showInfo(s) {
   }
 }
 
+//clear button
+function ClearFields() {
+     document.getElementById("final_span").innerText = "";
+     $('#cleared-fade').show();
+	 $('#cleared-fade').fadeOut(2000);
+     return;
+}
+
+
+// Copy to clipboard on a click event
+document.querySelector("#copy-button").addEventListener('click', function() {
+	var reference_element = document.querySelector('#final_span');
+	var range = document.createRange();
+	text = range.selectNodeContents(reference_element);
+
+    window.getSelection().removeAllRanges();
+	window.getSelection().addRange(range);
+
+	var success = document.execCommand('copy');
+	if(success){
+		console.log('Successfully copied to clipboard');
+		$('#clipboard-fade').show();
+		$('#clipboard-fade').fadeOut(2000);
+    }
+	else{
+		console.log('Unable to copy to clipboard');
+    }
+	window.getSelection().removeRange(range);
+
+	setTimeout(function(){
+        document.getElementById('aap').className = 'waa';
+    }, 2500);
+});
+
+//display a message on successful copy
+$(document).ready(function() {
+    $('#clipboard-fade').hide();
+    $('#cleared-fade').hide();
+});
+
 
 
 </script>
 
+<style>
+#clipboard-fade{
+    opacity:1;
+    transition:opacity 500ms;
+}
+
+#clipboard-fade.waa {
+    opacity:0;
+}
+
+</style>
 
