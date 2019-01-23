@@ -9,6 +9,7 @@ django-heroku==0.3.1
 hyperlink==18.0.0
 incremental==17.5.0
 gunicorn==19.9.0
+pathlib==1.0.1
 pydub==0.23.0
 PyHamcrest==1.9.0
 pytz==2018.7
