@@ -1,1 +1,1 @@
-web: gunicorn techv-speech-to-text.wsgi
+web: gunicorn speech_to_text.wsgi
