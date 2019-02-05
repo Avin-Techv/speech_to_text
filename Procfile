@@ -1,1 +1,1 @@
-web: gunicorn limitless-fjord-95895.wsgi
+web: gunicorn techv-speech-to-text.wsgi
