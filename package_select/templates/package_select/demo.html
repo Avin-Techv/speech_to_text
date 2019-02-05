@@ -1,0 +1,410 @@
+{% include 'package_select/base.html' %}
+{% load static %}
+<!-- Custom style for this page-->
+<link href="{%static 'css/recorder_google.css' %}" rel="stylesheet">
+<link href="{%static 'css/default.min.css' %}" rel="stylesheet">
+
+<body>
+    <div class="container">
+      <h1>Speech To Text</h1>
+        <div id="info">
+      <p id="info_start">Click on the microphone icon and begin speaking.</p>
+      <p id="info_speak_now">Speak now. Detecting Speech...</p>
+      <p id="info_no_speech">No speech was detected. Please click the image to continue</p>
+      <p id="info_no_microphone" style="display:none">
+        No microphone was found. Ensure that a microphone is installed and that
+        microphone settings</a> are configured correctly.</p>
+      <p id="info_allow">Click the "Allow" button above to enable your microphone.</p>
+  <p id="info_denied">Permission to use - was denied.</p>
+      <p id="info_blocked">Permission to use microphone is blocked. To change,
+        go to chrome://settings/contentExceptions#media-stream</p>
+      <p id="info_upgrade">Web Speech API is not supported by this browser.
+         Upgrade to <a href="//www.google.com/chrome">Chrome</a>
+         version 25 or later.</p>
+    </div>
+
+
+      {% block content %}
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="row">
+            <div id="visualization" class="col-10" style="height: 160px;">
+                    <div id="waveform"></div>
+            </div>
+            <div class="col-2">
+                <div id="icon" class="square">
+                    <button id="micBtn" style="height: 160px; width: 160px; visibility: show; margin-left: -18px;" onclick="startButton(event)">
+                        <img id="start_img" src="../static/icon/mic.png"  style="height: 128px; width: 128px; border-style: dotted;">
+                    </button>
+                </div>
+            </div>
+        </div>
+        <br><br>
+        <div class="row">
+            <div id="results" class="col-12">
+              <span id="final_span" class="final"></span>
+              <span id="interim_span" class="interim"></span>
+              <p>
+            </div>
+            </div>
+    <br>
+    <div class="row">
+        <div class="col-6">
+            <center>
+                <button type="button" class="w3-button w3-blue w3-round" id="copy-button" >Copy to Clipboard</button>
+                <button type="button" class="w3-button w3-blue w3-round" onclick="ClearFields();">Clear</button>
+                <!--<button type="button" class="w3-button w3-blue w3-round" id="abortBtn">Abort</button>-->
+            </center>
+        </div>
+        <div class="col-6">
+      <div id="div_language">
+        <select id="select_language" class="btn btn-primary dropdown-toggle" onchange="updateCountry()"></select>
+        <select id="select_dialect" class="btn btn-primary dropdown-toggle"></select>
+      </div>
+            </div>
+        <div class="col-sm-12">
+            <center>
+                <div id="clipboard-nothing">Nothing to Copy</div>
+                <div id="clipboard-fade">Copied to Clipboard</div>
+                <div id="cleared-fade">Cleared</div>
+            </center>
+        </div>
+            </div>
+
+
+    {% endblock %}
+
+    </div>
+</body>
+
+
+<script>
+
+//language select
+    var langs =
+[['English',         ['en-AU', 'Australia'],
+                     ['en-CA', 'Canada'],
+                     ['en-IN', 'India'],
+                     ['en-NZ', 'New Zealand'],
+                     ['en-ZA', 'South Africa'],
+                     ['en-GB', 'United Kingdom'],
+                     ['en-US', 'United States']]];
+
+for (var i = 0; i < langs.length; i++) {
+  select_language.options[i] = new Option(langs[i][0], i);
+}
+select_language.selectedIndex = 0;
+updateCountry();
+select_dialect.selectedIndex = 2;
+showInfo('info_start');
+
+function updateCountry() {
+  for (var i = select_dialect.options.length - 1; i >= 0; i--) {
+    select_dialect.remove(i);
+  }
+  var list = langs[select_language.selectedIndex];
+  for (var i = 1; i < list.length; i++) {
+    select_dialect.options.add(new Option(list[i][1], list[i][0]));
+  }
+  select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+}
+
+
+//toggle mic icon on click
+function toggle_mic_image()
+{
+    var image = document.getElementById('start_img');
+
+    var img1 = "../static/icon/mic.png";
+    var img2 = "../static/icon/loader.gif";
+
+    if (image.getAttribute('src')==img1) {
+       image.setAttribute('src', img2);
+       showInfo('info_speak_now');
+
+    } else if ((image.getAttribute('src')==img2)) {
+       image.setAttribute('src', img1);
+           showInfo('info_start');
+    }
+}
+
+var final_transcript = '';
+var recognizing = false;
+var ignore_onend;
+var start_timestamp;
+if (!('webkitSpeechRecognition' in window)) {
+  upgrade();
+} else {
+  micBtn.style.display = 'inline-block';
+  var recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onstart = function() {
+    recognizing = true;
+    showInfo('info_speak_now');
+    //wavesurfer.microphone.start();
+    start_img.src = '../static/icon/loader.gif';
+    console.log("3");
+  };
+
+  recognition.onerror = function(event) {
+    if (event.error == 'no-speech') {
+      start_img.src = '../static/icon/mic-block.png';
+      console.log("4");
+      showInfo('info_no_speech');
+      wavesurfer.microphone.stop();
+      ignore_onend = true;
+    }
+    if (event.error == 'audio-capture') {
+      console.log("before 5");
+      start_img.src = '../static/icon/mic.png';
+      console.log("5");
+      showInfo('info_no_microphone');
+      ignore_onend = true;
+    }
+    if (event.error == 'not-allowed') {
+      if (event.timeStamp - start_timestamp < 100) {
+        showInfo('info_blocked');
+      } else {
+        showInfo('info_denied');
+      }
+      ignore_onend = true;
+    }
+  };
+
+  recognition.onend = function() {
+    recognizing = false;
+    wavesurfer.microphone.stop();
+    if (ignore_onend) {
+      return;
+    }
+    console.log("before 6");
+    start_img.src = '../static/icon/mic.png';
+    console.log("6");
+    wavesurfer.microphone.stop();
+    if (!final_transcript) {
+      showInfo('info_start');
+      wavesurfer.microphone.start();
+      return;
+    }
+    showInfo('info_start');
+    if (window.getSelection) {
+      window.getSelection().removeAllRanges();
+      var range = document.createRange();
+      range.selectNode(document.getElementById('final_span'));
+      window.getSelection().addRange(range);
+    }
+  };
+
+  recognition.onresult = function(event) {
+    var interim_transcript = '';
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        final_transcript += event.results[i][0].transcript;
+      } else {
+        interim_transcript += event.results[i][0].transcript;
+      }
+    }
+    final_transcript = capitalize(final_transcript);
+    final_span.innerHTML = linebreak(final_transcript);
+    interim_span.innerHTML = linebreak(interim_transcript);
+    if (final_transcript || interim_transcript) {
+      showButtons('inline-block');
+    }
+  };
+
+//start of app.js
+'use strict';
+
+var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+var wavesurfer, context, processor;
+
+    // Init & load
+    document.addEventListener('DOMContentLoaded', function() {
+        var micBtn = document.querySelector('#micBtn');
+
+        micBtn.onclick = function() {
+            if (wavesurfer === undefined) {
+                if (isSafari) {
+                    // Safari 11 or newer automatically suspends new AudioContext's that aren't
+                    // created in response to a user-gesture, like a click or tap, so create one
+                    // here (inc. the script processor)
+                    var AudioContext =
+                        window.AudioContext || window.webkitAudioContext;
+                    context = new AudioContext();
+                    processor = context.createScriptProcessor(1024, 1, 1);
+                    startButton(event);
+                }
+
+                // Init wavesurfer
+                wavesurfer = WaveSurfer.create({
+                    container: '#waveform',
+                    waveColor: 'black',
+                    interact: false,
+                    cursorWidth: 0,
+                    audioContext: context || null,
+                    audioScriptProcessor: processor || null,
+                    plugins: [WaveSurfer.microphone.create()]
+                });
+
+                wavesurfer.microphone.on('deviceReady', function() {
+                    console.info('Device ready!');
+                    var image = document.getElementById('start_img');
+                    var img2 = "../static/icon/loader.gif";
+                    image.setAttribute('src', img2);
+                    //toggle_mic_image();
+                    //console.log("func called 1");
+                    startButton(event);
+                    });
+                wavesurfer.microphone.on('deviceError', function(code) {
+                    console.warn('Device error: ' + code);
+                });
+                wavesurfer.microphone.start();
+            } else {
+                // start/stop mic on button click
+                if (wavesurfer.microphone.active) {
+                    wavesurfer.microphone.stop();
+                    recognition.stop();
+                    console.log(recognition)
+                    start_img.src = '../static/icon/mic.png';
+                    showInfo('info_start');
+                    recognizing = false;
+                } else {
+
+                    wavesurfer.microphone.start();
+                    showInfo('info_start');
+                    var image = document.getElementById('start_img');
+                    var img2 = "../static/icon/loader.gif";
+                    image.setAttribute('src', img2);
+                    startButton(event);
+                }
+            }
+        };
+    });
+    //end of app.js
+
+}
+
+function upgrade() {
+  //micBtn.style.visibility = 'hidden';
+  start_img.src = '../static/icon/mic128.png';
+  showInfo('info_upgrade');
+}
+
+var two_line = /\n\n/g;
+var one_line = /\n/g;
+function linebreak(s) {
+  return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+}
+
+var first_char = /\S/;
+function capitalize(s) {
+  return s.replace(first_char, function(m) { return m.toUpperCase(); });
+}
+
+function startButton(event) {
+  if (recognizing) {
+    recognition.stop();
+    start_img.src = '../static/icon/mic.png';
+    showInfo('info_start');
+    return;
+  }
+  final_transcript = '';
+  recognition.lang = select_dialect.value;
+  recognition.start();
+  ignore_onend = false;
+  final_span.innerHTML = '';
+  interim_span.innerHTML = '';
+  start_img.src = '../static/icon/mic-mute.png';
+  console.log("7");
+  showInfo('info_allow');
+  showButtons('none');
+  start_timestamp = event.timeStamp;
+}
+
+
+function showInfo(s) {
+  if (s) {
+    for (var child = info.firstChild; child; child = child.nextSibling) {
+      if (child.style) {
+        child.style.display = child.id == s ? 'inline' : 'none';
+      }
+    }
+    info.style.visibility = 'visible';
+  } else {
+    info.style.visibility = 'hidden';
+  }
+}
+
+//clear button
+function ClearFields() {
+     if ( ($("#final_span").text().length == "0")&&($("#interim_span").text().length == "0") ) {
+        alert("No Text to Clear");
+        return;
+     }
+     else{
+        document.getElementById("interim_span").innerText = "";
+        document.getElementById("final_span").innerText = "";
+        setTimeout(function(){ alert("Cleared"); }, 100);
+        //alert("Cleared");
+        return;
+     }
+}
+
+// Copy to clipboard on a click event
+document.querySelector("#copy-button").addEventListener('click', function() {
+	var reference_element = document.querySelector('#final_span');
+	var range = document.createRange();
+	text = range.selectNodeContents(reference_element);
+
+    window.getSelection().removeAllRanges();
+	window.getSelection().addRange(range);
+
+	var success = document.execCommand('copy');
+	if ($("#final_span").text().length == "0"){
+	    alert("No text to copy");
+	    //$('#clipboard-nothing').show();
+	    //$('#clipboard-nothing').fadeOut(2000);
+	}
+	else if(success){
+	    alert("Successfully Copied to Clipboard");
+	    //$('#clipboard-fade').show();
+		//$('#clipboard-fade').fadeOut(2000);
+    }
+	else{    recognizing = false;
+    recognition.stop();
+	    alert("Unable to copy to clipboard");
+    }
+	window.getSelection().removeRange(range);
+});
+
+//display a message on successful copy
+$(document).ready(function() {
+    $('#clipboard-nothing').hide();
+    $('#clipboard-fade').hide();
+    $('#clipboard-fade').hide();
+    $('#cleared-fade').hide();
+});
+
+
+</script>
+
+<style>
+
+.square {
+  width: 128px;
+  height: 128px;
+  float: right;
+}
+
+#clipboard-fade{
+    opacity:1;
+    transition:opacity 500ms;
+}
+
+#clipboard-fade.waa {
+    opacity:0;
+}
+
+</style>

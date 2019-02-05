@@ -21,11 +21,12 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from pygame import mixer
 
-mixer.init()
+# mixer.init()
 
 
 class SelectPackage(FormView):
-    template_name = "package_select/home.html"
+    template_name = "package_select/demo.html"
+    # template_name = "package_select/home.html"
     form_class = SelectPackageForm
     success_url = '.'
 
@@ -83,6 +84,15 @@ class AnalyseFile(View):
 
 class RecordPackageFile(TemplateView):
     template_name = "package_select/record_file_package.html"
+
+    def get_context_data(self, **kwargs):
+        if 'view' not in kwargs:
+            kwargs['view'] = self
+        return kwargs
+
+
+class Demo(TemplateView):
+    template_name = "package_select/demo.html"
 
     def get_context_data(self, **kwargs):
         if 'view' not in kwargs:
